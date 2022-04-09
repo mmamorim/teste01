@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type="importmap">
+    {
+        "imports": {
+            "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+        }
+    }
+    </script>
+</head>
+
+<body>
+
+    <div id="app">
+        {{ message }}
+        <button @click="mudar">mudar</button>
+        <compo></compo>
+        <compo></compo>
+        <component :is="component" :key="refresh"></component>
+        <comp2></comp2>
+    </div>
+
+    <script type="module">
+        import { createApp, shallowRef } from 'vue'
+        import compo from './compo-01.js'
+        import { defineAsyncComponent } from 'vue'
+
+        const comp2 = defineAsyncComponent(() => {
+            return new Promise((resolve, reject) => {
+                // ...load component from server
+                resolve({
+                    template: `
+                        <h2>Oi gente</h2>
+                    `
+                })
+            })
+        })
+
+        createApp({
+            components: {
+                compo, comp2
+            },
+            computed: {
+                component() {
+                    return this.compObj;
+                }
+            },
+            data() {
+                return {
+                    message: 'Hello Vue!',
+                    compObj: shallowRef(comp2),
+                    refresh: 0,
+                }
+            },
+            methods: {
+                mudar() {
+                    console.log("mudar");
+                    this.compObj = compo;
+                    this.refresh++;
+                    this.$forceUpdate();
+                }
+            }
+        }).mount('#app')
+    </script>
+</body>
+
+</html>
